@@ -12,7 +12,8 @@
 
     <modules>
         <module>config-flight-exporter</module>
-        <!-- <module>config-flight-consumer</module> -->
+        <module>config-flight-client</module>
+        <module>features</module>
     </modules>
 
 </project>

@@ -12,6 +12,7 @@
 
     <groupId>net.nanthrax.karaf.arrow</groupId>
     <artifactId>config-flight-provider</artifactId>
+    <name>Apache Karaf Arrow :: Config Flight Provider</name>
     <packaging>bundle</packaging>
 
     <dependencies>
@@ -59,6 +60,51 @@
                 <version>5.1.9</version>
                 <extensions>true</extensions>
                 <inherited>true</inherited>
+                <configuration>
+                    <instructions>
+                        <Bundle-Activator>net.nanthrax.karaf.arrow.Activator</Bundle-Activator>
+                        <Export-Package>
+                            net.nanthrax.karaf.arrow
+                        </Export-Package>
+                        <Import-Package>
+                            !com.aayushatharva.brotli4j*,
+                            !com.github.luben.zstd,
+                            !com.google*,
+                            !com.jcraft.jzlib,
+                            !com.ning*,
+                            !io.grpc*,
+                            !io.netty*,
+                            !net.jpountz*,
+                            !org.conscrypt*,
+                            !lzma.sdk*,
+                            io.perfmark;resolution:=optional,
+                            com.oracle.svm.core.annotate;resolution:=optional,
+                            com.sun.jndi.dns;resolution:=optional,
+                            org.bouncycastle*;resolution:=optional,
+                            org.checkerframework*;resolution:=optional,
+                            org.eclipse.jetty*;resolution:=optional,
+                            org.jboss.marshalling;resolution:=optional,
+                            reactor*;resolution:=optional,
+                            sun.security*;resolution:=optional,
+                            javax.annotation;version="[1,4)",
+                            javax.annotation.meta;resolution:=optional,
+                            *
+                        </Import-Package>
+                        <Private-Package>
+                            com.aayushatharva.brotli4j*,
+                            com.github.luben.zstd,
+                            com.ning*,
+                            com.google*,
+                            com.jcraft.jzlib,
+                            io.grpc*,
+                            io.netty*,
+                            lzma.sdk*,
+                            net.jpountz*,
+                            org.apache.arrow*,
+                            org.conscrypt*
+                        </Private-Package>
+                    </instructions>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
