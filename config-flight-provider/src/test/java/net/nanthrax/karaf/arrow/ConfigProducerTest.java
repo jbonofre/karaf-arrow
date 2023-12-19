@@ -24,7 +24,7 @@ public class ConfigProducerTest {
     public void getStream() throws Exception {
         ConfigurationAdmin configurationAdmin = new ConfigAdminTest();
         BufferAllocator allocator = new RootAllocator();
-        ConfigProducer configProducer = new ConfigProducer(allocator);
+        ConfigProducer configProducer = new ConfigProducer(allocator, null);
         configProducer.init(configurationAdmin);
         ConfigDataset dataset = configProducer.getConfigDataset("my.first.pid");
 

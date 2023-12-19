@@ -11,7 +11,7 @@
     <name>Apache Karaf Arrow</name>
 
     <modules>
-        <module>config-flight-exporter</module>
+        <module>config-flight-provider</module>
         <module>config-flight-client</module>
         <module>features</module>
     </modules>

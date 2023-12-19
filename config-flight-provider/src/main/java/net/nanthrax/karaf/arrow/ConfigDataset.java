@@ -18,6 +18,7 @@ public class ConfigDataset implements AutoCloseable {
 
     private final Schema schema;
     private final Table table;
+    private final long rows;
 
     public ConfigDataset(Configuration configuration, BufferAllocator allocator) {
         this.schema = new Schema(Arrays.asList(
@@ -47,6 +48,8 @@ public class ConfigDataset implements AutoCloseable {
         valueVector.setValueCount(configuration.getProperties().size());
 
         this.table = new Table(Arrays.asList(keyVector, valueVector));
+
+        this.rows = configuration.getProperties().size();
     }
 
     public Schema getSchema() {
@@ -55,6 +58,10 @@ public class ConfigDataset implements AutoCloseable {
 
     public Table getTable() {
         return this.table;
+    }
+
+    public long getRows() {
+        return this.rows;
     }
 
     @Override

@@ -21,7 +21,8 @@ public class Activator implements BundleActivator {
     public void start(BundleContext context) throws Exception {
         allocator = new RootAllocator();
         Location location = Location.forGrpcInsecure("0.0.0.0", 33333);
-        configProducer = new ConfigProducer(allocator);
+        configProducer = new ConfigProducer(allocator, location);
+        configProducer.init(context);
         flightServer = FlightServer.builder(allocator, location, configProducer).build();
         flightServer.start();
         LOGGER.info("Starting Arrow Flight Server on port {}", flightServer.getPort());
