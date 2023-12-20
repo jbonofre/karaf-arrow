@@ -8,6 +8,7 @@ import org.apache.arrow.flight.FlightStream;
 import org.apache.arrow.flight.Location;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
+import org.apache.arrow.vector.FieldVector;
 import org.apache.arrow.vector.VectorSchemaRoot;
 
 import java.nio.charset.StandardCharsets;
@@ -23,7 +24,10 @@ public class ConfigFlightClient {
             System.out.println("Flight info: " + flightInfo);
             try (FlightStream flightStream = flightClient.getStream(flightInfo.getEndpoints().get(0).getTicket())) {
                 try (VectorSchemaRoot vectorSchemaRoot = flightStream.getRoot()) {
-                    System.out.println(vectorSchemaRoot.contentToTSVString());
+                    while (flightStream.next()) {
+                        System.out.println("Row count: " + vectorSchemaRoot.getRowCount());
+                        System.out.println(vectorSchemaRoot.contentToTSVString());
+                    }
                 }
             }
         }

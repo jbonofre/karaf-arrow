@@ -3,7 +3,6 @@ package net.nanthrax.karaf.arrow;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.vector.VarCharVector;
 import org.apache.arrow.vector.VectorSchemaRoot;
-import org.apache.arrow.vector.table.Table;
 import org.apache.arrow.vector.types.pojo.ArrowType;
 import org.apache.arrow.vector.types.pojo.Field;
 import org.apache.arrow.vector.types.pojo.FieldType;
@@ -17,7 +16,7 @@ import java.util.Enumeration;
 public class ConfigDataset implements AutoCloseable {
 
     private final Schema schema;
-    private final Table table;
+    private final VectorSchemaRoot root;
     private final long rows;
 
     public ConfigDataset(Configuration configuration, BufferAllocator allocator) {
@@ -47,7 +46,7 @@ public class ConfigDataset implements AutoCloseable {
         }
         valueVector.setValueCount(configuration.getProperties().size());
 
-        this.table = new Table(Arrays.asList(keyVector, valueVector));
+        this.root = new VectorSchemaRoot(schema, Arrays.asList(keyVector, valueVector), configuration.getProperties().size());
 
         this.rows = configuration.getProperties().size();
     }
@@ -56,8 +55,8 @@ public class ConfigDataset implements AutoCloseable {
         return this.schema;
     }
 
-    public Table getTable() {
-        return this.table;
+    public VectorSchemaRoot getRoot() {
+        return this.root;
     }
 
     public long getRows() {
@@ -66,7 +65,7 @@ public class ConfigDataset implements AutoCloseable {
 
     @Override
     public void close() {
-        table.close();
+        root.close();
     }
 
 }

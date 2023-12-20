@@ -2,6 +2,7 @@ package net.nanthrax.karaf.arrow;
 
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
+import org.apache.arrow.vector.FieldVector;
 import org.apache.arrow.vector.table.Row;
 import org.junit.jupiter.api.Test;
 import org.osgi.framework.InvalidSyntaxException;
@@ -10,6 +11,7 @@ import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -28,19 +30,29 @@ public class ConfigProducerTest {
         configProducer.init(configurationAdmin);
         ConfigDataset dataset = configProducer.getConfigDataset("my.first.pid");
 
-        assertEquals(3, dataset.getTable().getRowCount());
+        int rowCount = dataset.getRoot().getRowCount();
+        assertEquals(3, rowCount);
 
-        Row first = dataset.getTable().immutableRow().setPosition(2);
-        assertEquals("first", first.getVarCharObj("key"));
-        assertEquals("1", first.getVarCharObj("value"));
+        FieldVector keysVector = dataset.getRoot().getVector("key");
+        ArrayList<String> keys = new ArrayList<>();
+        for (int i = 0; i < rowCount; i++) {
+            keys.add(keysVector.getObject(i).toString());
+        }
 
-        Row second = dataset.getTable().immutableRow().setPosition(1);
-        assertEquals("second", second.getVarCharObj("key"));
-        assertEquals("2", second.getVarCharObj("value"));
+        FieldVector valuesVector = dataset.getRoot().getVector("value");
+        ArrayList<String> values = new ArrayList<>();
+        for (int i = 0; i < rowCount; i++) {
+            values.add(valuesVector.getObject(i).toString());
+        }
 
-        Row third = dataset.getTable().immutableRow().setPosition(0);
-        assertEquals("third", third.getVarCharObj("key"));
-        assertEquals("3", third.getVarCharObj("value"));
+        assertEquals("first", keys.get(2));
+        assertEquals("1", values.get(2));
+
+        assertEquals("second", keys.get(1));
+        assertEquals("2", values.get(1));
+
+        assertEquals("third", keys.get(0));
+        assertEquals("3", values.get(0));
     }
 
     class ConfigurationTest implements Configuration {

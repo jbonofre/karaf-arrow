@@ -3,6 +3,7 @@ package net.nanthrax.karaf.arrow;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.FieldVector;
+import org.apache.arrow.vector.VectorSchemaRoot;
 import org.apache.arrow.vector.holders.NullableVarCharHolder;
 import org.apache.arrow.vector.table.Row;
 import org.apache.arrow.vector.table.Table;
@@ -99,23 +100,19 @@ public class ConfigDatasetTest {
             }
         };
         ConfigDataset dataset = new ConfigDataset(configuration, allocator);
-        Table table = dataset.getTable();
+        VectorSchemaRoot root = dataset.getRoot();
 
-        assertEquals(3, table.getRowCount());
+        assertEquals(3, root.getRowCount());
 
-        Row row = table.immutableRow();
+        FieldVector keysVector = root.getVector("key");
+        assertEquals("third", keysVector.getObject(0).toString());
+        assertEquals("second", keysVector.getObject(1).toString());
+        assertEquals("first", keysVector.getObject(2).toString());
 
-        Row first = row.setPosition(2);
-        assertEquals("first", first.getVarCharObj("key"));
-        assertEquals("1", first.getVarCharObj("value"));
-
-        Row second = row.setPosition(1);
-        assertEquals("second", second.getVarCharObj("key"));
-        assertEquals("2", second.getVarCharObj("value"));
-
-        Row third = row.setPosition(0);
-        assertEquals("third", third.getVarCharObj("key"));
-        assertEquals("3", third.getVarCharObj("value"));
+        FieldVector valuesVector = root.getVector("value");
+        assertEquals("3", valuesVector.getObject(0).toString());
+        assertEquals("2", valuesVector.getObject(1).toString());
+        assertEquals("1", valuesVector.getObject(2).toString());
     }
 
 }

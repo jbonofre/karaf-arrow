@@ -10,11 +10,15 @@ import org.apache.arrow.flight.NoOpFlightProducer;
 import org.apache.arrow.flight.Ticket;
 import org.apache.arrow.memory.BufferAllocator;
 import org.apache.arrow.util.AutoCloseables;
+import org.apache.arrow.vector.VarCharVector;
 import org.apache.arrow.vector.VectorLoader;
 import org.apache.arrow.vector.VectorSchemaRoot;
 import org.apache.arrow.vector.VectorUnloader;
 import org.apache.arrow.vector.ipc.message.ArrowRecordBatch;
-import org.apache.arrow.vector.table.Row;
+import org.apache.arrow.vector.types.pojo.ArrowType;
+import org.apache.arrow.vector.types.pojo.Field;
+import org.apache.arrow.vector.types.pojo.FieldType;
+import org.apache.arrow.vector.types.pojo.Schema;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -25,7 +29,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -67,20 +73,17 @@ public class ConfigProducer extends NoOpFlightProducer implements AutoCloseable 
 
     @Override
     public void getStream(CallContext callContext, Ticket ticket, ServerStreamListener listener) {
-        FlightDescriptor flightDescriptor = FlightDescriptor.path(new String(ticket.getBytes(), StandardCharsets.UTF_8));
+        String pid = new String(ticket.getBytes(), StandardCharsets.UTF_8);
+        LOGGER.info("Get stream for PID {}", pid);
+        FlightDescriptor flightDescriptor = FlightDescriptor.path(pid);
         ConfigDataset dataset = this.datasets.get(flightDescriptor);
         if (dataset == null) {
             throw CallStatus.NOT_FOUND.withDescription("PID not found").toRuntimeException();
         }
-        VectorUnloader unloader = new VectorUnloader(dataset.getTable().toVectorSchemaRoot());
-        try (VectorSchemaRoot root = VectorSchemaRoot.create(this.datasets.get(flightDescriptor).getSchema(), allocator)) {
-            VectorLoader loader = new VectorLoader(root);
-            listener.start(root);
-            ArrowRecordBatch record = unloader.getRecordBatch();
-            loader.load(record);
-            listener.putNext();
-            listener.completed();
-        }
+        listener.start(dataset.getRoot());
+        LOGGER.info("   Row count: {}", dataset.getRoot().getRowCount());
+        listener.putNext();
+        listener.completed();
     }
 
     @Override
